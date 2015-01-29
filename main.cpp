@@ -1,9 +1,6 @@
 
 #include <vector>
 
-/*
- * @points should be mutable
- */
 double* bezier_interp (double* points, double* temp_space, int temp_space_size, int points_total, double t_step_t) {
 	memcpy(temp_space, points, temp_space_size);
 	for (int pointsi = points_total; pointsi > 1; --pointsi){
