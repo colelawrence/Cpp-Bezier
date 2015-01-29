@@ -1,23 +1,31 @@
 
 #include <vector>
 
+/*
+ * @points should be mutable
+ */
+double* bezier_interp (double* points, double* temp_space, int temp_space_size, int points_total, double t_step_t) {
+	memcpy(temp_space, points, temp_space_size);
+	for (int pointsi = points_total; pointsi > 1; --pointsi){
+		for (int pointsj = 1; pointsj < pointsi; pointsj++) {
+			points[pointsj-1] -= (points[pointsj-1] - points[pointsj]) * t_step_t;
+		}
+	}
+	return points;
+}
+
 double* bezier_t (double* numbers, int points_total, int definition) {
 	double *result = new double[definition];
 	
 	double t_step = 1 / ((double) definition - 1);
 	double t_step_t;
-	double* temp = new double[points_total];
+	double* temp_space = new double[points_total];
+	int temp_space_size = sizeof(*temp_space) * points_total;
 	for (int t = 0; t < definition; t++) {
 		t_step_t = t * t_step;
-		memcpy(temp, numbers, sizeof(*temp) * points_total);
-		for (int pointsi = points_total; pointsi > 1; --pointsi){
-			for (int pointsj = 1; pointsj < pointsi; pointsj++) {
-				temp[pointsj-1] -= (temp[pointsj-1] - temp[pointsj]) * t_step_t;
-			}
-		}
-		result[t] = temp[0];
+		result[t] = *bezier_interp(numbers, temp_space, temp_space_size, points_total, t_step_t);
 	}
-	delete[] temp;
+	delete[] temp_space;
 	return result;
 }
 
