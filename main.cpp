@@ -1,26 +1,24 @@
 
-#include <vector>
+#include <cstring>
 
-double* bezier_interp (double* points, double* temp_space, int temp_space_size, int points_total, double t_step_t) {
-	memcpy(temp_space, points, temp_space_size);
-	for (int pointsi = points_total; pointsi > 1; --pointsi){
-		for (int pointsj = 1; pointsj < pointsi; pointsj++) {
-			points[pointsj-1] -= (points[pointsj-1] - points[pointsj]) * t_step_t;
+double* bezier_interp (const double* numbers, double* temp_space, int temp_space_size, int numbers_total, double t_t_step) {
+	memcpy(temp_space, numbers, temp_space_size);
+	for (int length = numbers_total - 1; length > 0; --length){
+		for (int i = 0; i < length; i++) {
+			temp_space[i] -= (temp_space[i] - temp_space[i+1]) * t_t_step;
 		}
 	}
-	return points;
+	return temp_space;
 }
 
-double* bezier_t (double* numbers, int points_total, int definition) {
+double* bezier_t (double* numbers, int numbers_total, int definition) {
 	double *result = new double[definition];
-	
-	double t_step = 1 / ((double) definition - 1);
-	double t_step_t;
-	double* temp_space = new double[points_total];
-	int temp_space_size = sizeof(*temp_space) * points_total;
+
+	double t_step = 1. / (definition - 1);
+	double* temp_space = new double[numbers_total];
+	int temp_space_size = sizeof(*temp_space) * numbers_total;
 	for (int t = 0; t < definition; t++) {
-		t_step_t = t * t_step;
-		result[t] = *bezier_interp(numbers, temp_space, temp_space_size, points_total, t_step_t);
+		result[t] = *bezier_interp(numbers, temp_space, temp_space_size, numbers_total, t * t_step);
 	}
 	delete[] temp_space;
 	return result;
