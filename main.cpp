@@ -1,5 +1,6 @@
 
 #include <cstring>
+#include <tuple>
 
 double* bezier_interp (const double* numbers, double* temp_space, int temp_space_size, int numbers_total, double t_t_step) {
 	memcpy(temp_space, numbers, temp_space_size);
@@ -38,6 +39,8 @@ int main() {
 	for (int dix = 0; dix < definition; dix++){ std::cout << xs[dix] << "\t"; }
 	std::cout << "\n";
 	for (int diy = 0; diy < definition; diy++){ std::cout << ys[diy] << "\t"; }
+	delete[] xs;
+	delete[] ys;
 	std::cin.get();
 	return 0;
 }
