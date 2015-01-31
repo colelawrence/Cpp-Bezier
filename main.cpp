@@ -1,6 +1,4 @@
-
 #include <cstring>
-#include <tuple>
 
 double* bezier_interp (const double* numbers, double* temp_space, int temp_space_size, int numbers_total, double t_t_step) {
 	memcpy(temp_space, numbers, temp_space_size);
