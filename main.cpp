@@ -2,36 +2,31 @@
 #include <SFML/Graphics.hpp>
 #include "bezier_utility.h"
 
-void drawPoint (float x, float y, sf::RenderWindow* window) {
-	sf::RectangleShape point(sf::Vector2f(4, 4));
-	point.setPosition(x - 2, y - 2);
-    (*window).draw(point);
+void drawPoint (sf::RenderWindow* window, Point2D* point) {
+	sf::RectangleShape drawPoint(sf::Vector2f(4, 4));
+	drawPoint.setPosition(float((*point).X) - 2, float((*point).Y) - 2);
+    (*window).draw(drawPoint);
 }
 
-void drawPointsOfTs(sf::RenderWindow* window, double* ts, double* xs, double* ys, int numbers_total, int t_count) {
-	double* temp_space = new double[numbers_total];
-	int temp_space_size = sizeof(*temp_space) * numbers_total;
-	double t, x, y;
-	for (int step = 0; step < t_count; step++) {
-		t = ts[step];
-		x = *bezier_interp(xs, temp_space, temp_space_size, numbers_total, t);
-		y = *bezier_interp(ys, temp_space, temp_space_size, numbers_total, t);
-		drawPoint(float(x), float(y), window);
+void drawPoints (sf::RenderWindow* window, Point2D* points, int points_length) {
+	for (int i = 0; i < points_length; i++) {
+		drawPoint(window, &points[i]);
 	}
 }
 
 void drawTest3 (sf::RenderWindow* window) {
 	// Test code
 
-	double xs[4] = { 400, 400, 400, 400};
+	double xs[4] = { 400, 700, 100, 400};
 	double ys[4] = { 100, 790, 10, 700 };
-	int numbers_total = 4;
+	BezierCurve2D* bezier = new BezierCurve2D(xs, ys, 4);
 	int max_results = 200;
 	double goal_dist = 12;
 	double dist_tolerance = .1;
-	double* raster = rasterize_bezier(xs, ys, numbers_total, max_results, goal_dist, dist_tolerance);
-	drawPointsOfTs(window, raster, xs, ys, numbers_total, max_results);
-	std::cout << measure_bezier(xs, ys, numbers_total, goal_dist, dist_tolerance) << "\n";
+	Point2D* raster = (*bezier).rasterize(goal_dist, max_results, dist_tolerance);
+	drawPoints(window, raster, max_results);
+	delete[] raster;
+	std::cout << (*bezier).measure(goal_dist, dist_tolerance) << "\n";
 }
 
 
