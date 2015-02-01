@@ -3,8 +3,8 @@
 #include "bezier_utility.h"
 
 void drawPoint (float x, float y, sf::RenderWindow* window) {
-	sf::RectangleShape point(sf::Vector2f(12, 6));
-	point.setPosition(x - 6, y - 3);
+	sf::RectangleShape point(sf::Vector2f(4, 4));
+	point.setPosition(x - 2, y - 2);
     (*window).draw(point);
 }
 
@@ -20,17 +20,18 @@ void drawPointsOfTs(sf::RenderWindow* window, double* ts, double* xs, double* ys
 	}
 }
 
-void drawTest2 (sf::RenderWindow* window) {
+void drawTest3 (sf::RenderWindow* window) {
 	// Test code
 
-	double xs[5] = { 10, 100, 800, 300, 790 };
-	double ys[5] = { 10, 400, 400, 0, 790 };
-	int numbers_total = 5;
+	double xs[4] = { 400, 400, 400, 400};
+	double ys[4] = { 100, 790, 10, 700 };
+	int numbers_total = 4;
 	int max_results = 200;
 	double goal_dist = 12;
-	double dist_tolerance = .5;
-	double* raster = rasterize_linear_bezier(xs, numbers_total, max_results, goal_dist, dist_tolerance);
+	double dist_tolerance = .1;
+	double* raster = rasterize_bezier(xs, ys, numbers_total, max_results, goal_dist, dist_tolerance);
 	drawPointsOfTs(window, raster, xs, ys, numbers_total, max_results);
+	std::cout << measure_bezier(xs, ys, numbers_total, goal_dist, dist_tolerance) << "\n";
 }
 
 
@@ -40,18 +41,16 @@ int main()
     //sf::CircleShape shape(3.f);
 	//shape.setFillColor(sf::Color::White);
 
-    while (window.isOpen())
-    {
-        sf::Event event;
-        while (window.pollEvent(event))
-        {
-            if (event.type == sf::Event::Closed)
-                window.close();
-        }
-        window.clear();
-		drawTest2(&window);
-        window.display();
-    }
+	window.clear();
+	drawTest3(&window);
+    window.display();
+    while (window.isOpen()) {
+		sf::Event event;
+		while (window.pollEvent(event)) {
+			if (event.type == sf::Event::Closed)
+				window.close();
+		}
+	}
 
-    return 0;
+	return 0;
 }

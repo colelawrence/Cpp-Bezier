@@ -66,6 +66,47 @@ double* rasterize_bezier (double* x_values, double* y_values, int values_count, 
 	return results_t;
 }
 
+double measure_bezier (double* x_values, double* y_values, int values_count, double segment_dist, double tolerance) {
+	double total_length = 0;
+	double* temp_space = new double[values_count];
+	int temp_space_size = sizeof(*temp_space) * values_count;
+	double last_result_t, last_result_x, last_result_y;
+	// first value is always 0
+	last_result_t = 0;
+	last_result_x = *bezier_interp(x_values, temp_space, temp_space_size, values_count, last_result_t);
+	last_result_y = *bezier_interp(y_values, temp_space, temp_space_size, values_count, last_result_t);
+	for (int max_iterations = 128; max_iterations > 0; --max_iterations) { // just in case, limit
+		double t, dist, x, y;
+		double t_low = last_result_t;
+		double t_high = 1; // find a way to approx based on previous
+		for (int max_iterations = 128; max_iterations > 0; --max_iterations) { // attempt to find next point
+			t = (t_high + t_low) / 2;
+			x = *bezier_interp(x_values, temp_space, temp_space_size, values_count, t);
+			y = *bezier_interp(y_values, temp_space, temp_space_size, values_count, t);
+			dist = calc_dist(last_result_x, x, last_result_y, y);
+			if (dist < segment_dist - tolerance) { // dist is too low, increase t
+				t_low = t;
+				t = (t_high + t) / 2;
+			} else if (dist > segment_dist + tolerance) { // dist is too high, decrease t
+				t_high = t;
+				t = (t_low + t) / 2;
+			} else { // dist is just right
+				break;
+			}
+		}
+		last_result_x = x;
+		last_result_y = y;
+		last_result_t = t;
+		if (t > 1) {
+			break; // end loop
+		} else {
+			total_length += dist;
+		}
+	}
+	delete[] temp_space;
+	return total_length;
+}
+
 double* rasterize_linear_bezier (double* values, int values_count, int max_results, double goal_dist, double tolerance) {
 	double* results_t = new double[max_results];
 	double* temp_space = new double[values_count];
