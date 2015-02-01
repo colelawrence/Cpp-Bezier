@@ -86,7 +86,7 @@ BezierCurve2D::BezierCurve2D(double* x_values, double* y_values, int values_leng
 	temp_space_bytes = values_length * sizeof(*temp_space);
 }
 
-Point2D* BezierCurve2D::rasterize (double goal_dist, int max_results, double tolerance) {
+Point2D* BezierCurve2D::rasterize (int max_results, double goal_dist, double tolerance) {
 	Point2D* results = new Point2D[max_results];
 	double last_result_t, last_result_x, last_result_y;
 	// first value is always 0

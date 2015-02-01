@@ -30,17 +30,11 @@ private:
 	Point2D* linear_raster (double* values, int max_results, double goal_dist, double tolerance);
 public:
 	BezierCurve2D(double* x_values, double* y_values, int values_length);
-	Point2D* rasterize (double goal_dist, int max_results, double tolerance);
+	Point2D* rasterize (int max_results, double goal_dist, double tolerance);
 	Point2D* rasterizeToX (int max_results, double goal_dist, double tolerance);
 	Point2D* rasterizeToY (int max_results, double goal_dist, double tolerance);
 	Point2D* getT (double t);
 	double measure (double segment_dist, double tolerance);
 };
 
-/*
-double* rasterize_bezier (double* x_values, double* y_values, int values_count, int max_results, double goal_dist, double tolerance);
-double measure_bezier (double* x_values, double* y_values, int values_count, double segment_dist, double tolerance);
-double* rasterize_linear_bezier (double* values, int values_count, int max_results, double goal_dist, double tolerance);
-double* bezier_interp (const double* numbers, double* temp_space, int temp_space_size, int numbers_total, double t);
- */
 #endif
