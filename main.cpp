@@ -1,4 +1,5 @@
 #include <cstring>
+#include <cmath>
 
 double* bezier_interp (const double* numbers, double* temp_space, int temp_space_size, int numbers_total, double t) {
 	memcpy(temp_space, numbers, temp_space_size);
@@ -20,52 +21,110 @@ void bezier_t (double* numbers, int numbers_total, double* result, int definitio
 	delete[] temp_space;
 }
 
-// Provide a certain amount of values and approximate spacing between. (for creating )
-void rasterize_bezier_to_waveform (double* x_values, double* y_values, int numbers_total, double* results, int definition) {
-	double step_x = (x_values[0] - x_values[numbers_total-1]) / definition;
-	double tolerance = 0.05 * step_x; // precision in percent
-	results[0] = y_values[0];
-	double goal_x = x_values[0]; // changes with each step
-	double* temp_space = new double[numbers_total];
-	int temp_space_size = sizeof(*temp_space) * numbers_total;
-	for (int step = 1; step < definition; ++step) {
-		goal_x += step_x; // Set a goal for ourself
-		double test;
-		double t = 0;
-		double dt = .5;
-		double dt_total = 0;
-		double last_low_t = t;
-		double last_high_t = t;
-		while (true) { // Bisection TODO
-			test = *bezier_interp(x_values, temp_space, temp_space_size, numbers_total, t);
-			if (test > goal_x + tolerance)
-				if (test > last_high_t)
-					dt *= -2;
-				else
-					dt *= .5;
+double calc_dist (double x1, double x2, double y1, double y2) {
+	x1 -= x2;
+	x1 *= x1;
+	y1 -= y2;
+	y1 *= y1;
+	return std::sqrt(x1 + y1);
+}
+
+double* rasterize_bezier (double* x_values, double* y_values, int values_count, int max_results, double goal_dist, double tolerance) {
+	double* results_t = new double[max_results];
+	double* temp_space = new double[values_count];
+	int temp_space_size = sizeof(*temp_space) * values_count;
+	double last_result_t, last_result_x, last_result_y;
+	// first value is always 0
+	last_result_t = 0;
+	last_result_x = *bezier_interp(x_values, temp_space, temp_space_size, values_count, last_result_t);
+	last_result_y = *bezier_interp(y_values, temp_space, temp_space_size, values_count, last_result_t);
+	for (int results_total = 0; results_total < max_results; ++results_total) { // for the amount of results
+		double t, dist, x, y;
+		double t_low = last_result_t;
+		double t_high = 1; // find a way to approx based on previous
+		for (int max_iterations = 128; max_iterations > 0; --max_iterations) { // attempt to find next point
+			//ax = *bezier_interp(x_values, temp_space, temp_space_size, values_count, a);
+			//ay = *bezier_interp(y_values, temp_space, temp_space_size, values_count, a);
+			//bx = *bezier_interp(x_values, temp_space, temp_space_size, values_count, b);
+			//by = *bezier_interp(y_values, temp_space, temp_space_size, values_count, b);
+			t = (t_high + t_low) / 2;
+			x = *bezier_interp(x_values, temp_space, temp_space_size, values_count, t);
+			y = *bezier_interp(y_values, temp_space, temp_space_size, values_count, t);
+			//dista = calc_dist(last_result_x, ax, last_result_y, ay);
+			//distb = calc_dist(last_result_x, bx, last_result_y, by);
+			dist = calc_dist(last_result_x, x, last_result_y, y);
+			if (dist < goal_dist - tolerance) { // dist is too low, increase t
+				t_low = t;
+				t = (t_high + t) / 2;
+			} else if (dist > goal_dist + tolerance) { // dist is too high, decrease t
+				t_high = t;
+				t = (t_low + t) / 2;
+			} else { // dist is just right
+				break;
+			}
 		}
+		last_result_x = x;
+		last_result_y = y;
+		last_result_t = t;
+		results_t[results_total] = t;
 	}
+	delete[] temp_space;
+	return results_t;
+}
+
+double bisect_to_goal (double* x_values, int numbers_total, double goal) {
+	return 0;
 }
 
 #include<iostream>
+#include <SFML/Graphics.hpp>
 
-int main() {
-	double numbers_x[] = {
-		0, 0, 4, 4
-	};
-	double numbers_y[] = {
-		0, 4, 4, 0
-	};
-	int definition = 8;
-	double* xs = new double[definition];
-	bezier_t(numbers_x, 4, xs, definition);
-	double* ys = new double[definition];
-	bezier_t(numbers_y, 4, ys, definition);
-	for (int dix = 0; dix < definition; dix++){ std::cout << xs[dix] << "\t"; }
-	std::cout << "\n";
-	for (int diy = 0; diy < definition; diy++){ std::cout << ys[diy] << "\t"; }
-	delete[] xs;
-	delete[] ys;
-	std::cin.get();
-	return 0;
+void drawPoint (float x, float y, sf::RenderWindow* window) {
+	sf::RectangleShape point(sf::Vector2f(3, 3));
+	point.setPosition(x - 1.5, y - 1.5);
+    (*window).draw(point);
+}
+
+void drawTest (sf::RenderWindow* window) {
+	// Test code
+	
+	double xs[4] = { 10, 100, 300, 790 };
+	double ys[4] = { 10, 400, 0, 790 };
+	int numbers_total = 4;
+	int max_results = 200;
+	double goal_dist = 6;
+	double dist_tolerance = .5;
+	double* raster = rasterize_bezier(xs, ys, numbers_total, max_results, goal_dist, dist_tolerance);
+	double* temp_space = new double[numbers_total];
+	int temp_space_size = sizeof(*temp_space) * numbers_total;
+	double t, x, y;
+	for (int step = 0; step < max_results; step++) {
+		t = raster[step];
+		x = *bezier_interp(xs, temp_space, temp_space_size, numbers_total, t);
+		y = *bezier_interp(ys, temp_space, temp_space_size, numbers_total, t);
+		drawPoint(float(x), float(y), window);
+	}
+}
+
+
+int main()
+{
+    sf::RenderWindow window(sf::VideoMode(800, 800), "Bezier test");
+    //sf::CircleShape shape(3.f);
+	//shape.setFillColor(sf::Color::White);
+
+    while (window.isOpen())
+    {
+        sf::Event event;
+        while (window.pollEvent(event))
+        {
+            if (event.type == sf::Event::Closed)
+                window.close();
+        }
+        window.clear();
+		drawTest(&window);
+        window.display();
+    }
+
+    return 0;
 }
