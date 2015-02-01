@@ -3,8 +3,8 @@
 #include "bezier_utility.h"
 
 void drawPoint (float x, float y, sf::RenderWindow* window) {
-	sf::RectangleShape point(sf::Vector2f(3, 3));
-	point.setPosition(x - 1.5, y - 1.5);
+	sf::RectangleShape point(sf::Vector2f(12, 6));
+	point.setPosition(x - 6, y - 3);
     (*window).draw(point);
 }
 
@@ -20,16 +20,16 @@ void drawPointsOfTs(sf::RenderWindow* window, double* ts, double* xs, double* ys
 	}
 }
 
-void drawTest1 (sf::RenderWindow* window) {
+void drawTest2 (sf::RenderWindow* window) {
 	// Test code
 
 	double xs[5] = { 10, 100, 800, 300, 790 };
 	double ys[5] = { 10, 400, 400, 0, 790 };
 	int numbers_total = 5;
 	int max_results = 200;
-	double goal_dist = 6;
+	double goal_dist = 12;
 	double dist_tolerance = .5;
-	double* raster = rasterize_bezier(xs, ys, numbers_total, max_results, goal_dist, dist_tolerance);
+	double* raster = rasterize_linear_bezier(xs, numbers_total, max_results, goal_dist, dist_tolerance);
 	drawPointsOfTs(window, raster, xs, ys, numbers_total, max_results);
 }
 
@@ -49,7 +49,7 @@ int main()
                 window.close();
         }
         window.clear();
-		drawTest1(&window);
+		drawTest2(&window);
         window.display();
     }
 

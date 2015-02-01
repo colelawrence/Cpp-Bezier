@@ -65,3 +65,37 @@ double* rasterize_bezier (double* x_values, double* y_values, int values_count, 
 	delete[] temp_space;
 	return results_t;
 }
+
+double* rasterize_linear_bezier (double* values, int values_count, int max_results, double goal_dist, double tolerance) {
+	double* results_t = new double[max_results];
+	double* temp_space = new double[values_count];
+	int temp_space_size = sizeof(*temp_space) * values_count;
+	double last_result_t, last_result_v;
+	// first value is always 0
+	last_result_t = 0;
+	last_result_v = *bezier_interp(values, temp_space, temp_space_size, values_count, last_result_t);
+	for (int results_total = 0; results_total < max_results; ++results_total) { // for the amount of results
+		double t, dist, v;
+		double t_low = last_result_t;
+		double t_high = 1; // find a way to approx based on previous
+		for (int max_iterations = 128; max_iterations > 0; --max_iterations) { // attempt to find next point
+			t = (t_high + t_low) / 2;
+			v = *bezier_interp(values, temp_space, temp_space_size, values_count, t);
+			dist = std::abs(last_result_v - v);
+			if (dist < goal_dist - tolerance) { // dist is too low, increase t
+				t_low = t;
+				t = (t_high + t) / 2;
+			} else if (dist > goal_dist + tolerance) { // dist is too high, decrease t
+				t_high = t;
+				t = (t_low + t) / 2;
+			} else { // dist is just right
+				break;
+			}
+		}
+		last_result_v = v;
+		last_result_t = t;
+		results_t[results_total] = t;
+	}
+	delete[] temp_space;
+	return results_t;
+}
