@@ -16,7 +16,7 @@ Point2D::Point2D(double x, double y):
 BezierBase::BezierBase(int values_length):
 	values_length(values_length) {
 	temp_space = new double[values_length];
-	temp_space_bytes = values_length * 8;
+	temp_space_bytes = values_length * sizeof *temp_space;
 }
 
 BezierBase::~BezierBase(){
