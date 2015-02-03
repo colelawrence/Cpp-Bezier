@@ -1,16 +1,17 @@
 #include<iostream>
+#include<vector>
 #include <SFML/Graphics.hpp>
 #include "bezier_utility.h"
 
-void drawPoint (sf::RenderWindow* window, Point2D* point) {
+void drawPoint (sf::RenderWindow* window, const Point2D &point) {
 	sf::RectangleShape drawPoint(sf::Vector2f(4, 4));
-	drawPoint.setPosition(float((*point).X) - 2, float((*point).Y) - 2);
+	drawPoint.setPosition(float(point.X) - 2, float(point.Y) - 2);
     (*window).draw(drawPoint);
 }
 
-void drawPoints (sf::RenderWindow* window, Point2D* points, int points_length) {
-	for (int i = 0; i < points_length; i++) {
-		drawPoint(window, &points[i]);
+void drawPoints (sf::RenderWindow* window, const std::vector<Point2D> &points) {
+	for (int i = 0; i < points.size(); i++) {
+		drawPoint(window, points.at(i));
 	}
 }
 
@@ -23,9 +24,9 @@ void drawTest3 (sf::RenderWindow* window) {
 	int max_results = 200;
 	double goal_dist = 12;
 	double dist_tolerance = .1;
-	Point2D* raster = (*bezier).rasterize(max_results, goal_dist, dist_tolerance);
-	drawPoints(window, raster, max_results);
-	delete[] raster;
+	std::vector<Point2D> raster = (*bezier).rasterize(max_results, goal_dist, dist_tolerance);
+	drawPoints(window, raster);
+	delete bezier;
 	std::cout << (*bezier).measure(goal_dist, dist_tolerance) << "\n";
 }
 

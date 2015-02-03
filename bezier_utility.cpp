@@ -1,5 +1,6 @@
 #include <cstring>
 #include <cmath>
+#include <vector>
 #include "bezier_utility.h"
 
 
@@ -46,14 +47,18 @@ double BezierCurve2D::calc_dist (double x1, double x2, double y1, double y2) {
 	return std::sqrt(x1 + y1);
 }
 
-Point2D* BezierCurve2D::linear_raster (double* values, int max_results, double goal_dist, double tolerance) {
-	Point2D* results = new Point2D[max_results];
-	double last_result_t, last_result_v;
+std::vector<Point2D> BezierCurve2D::linear_raster (double* values, int max_results, double goal_dist, double tolerance) {
+	std::vector<Point2D> results;
+	results.reserve(max_results);
+	double last_result_t, last_result_v, end_result;
 	// first value is always 0
 	last_result_t = 0;
 	last_result_v = *interp(last_result_t, values);
+	end_result = *interp(1, values);
 	for (int results_total = 0; results_total < max_results; ++results_total) { // for the amount of results
 		double t, dist, v;
+		if (tolerance > std::abs(end_result - last_result_v))
+			break;
 		double t_low = last_result_t;
 		double t_high = 1; // find a way to approx based on previous
 		for (int max_iterations = 128; max_iterations > 0; --max_iterations) { // attempt to find next point
@@ -72,9 +77,7 @@ Point2D* BezierCurve2D::linear_raster (double* values, int max_results, double g
 		}
 		last_result_v = v;
 		last_result_t = t;
-		Point2D* point = getT(t);
-		results[results_total].set(point);
-		delete point;
+		results.push_back(*getT(t));
 	}
 	return results;
 }
@@ -86,9 +89,10 @@ BezierCurve2D::BezierCurve2D(double* x_values, double* y_values, int values_leng
 	temp_space_bytes = values_length * sizeof(*temp_space);
 }
 
-Point2D* BezierCurve2D::rasterize (int max_results, double goal_dist, double tolerance) {
-	Point2D* results = new Point2D[max_results];
-	double last_result_t, last_result_x, last_result_y;
+std::vector<Point2D> BezierCurve2D::rasterize (int max_results, double goal_dist, double tolerance) {
+	std::vector<Point2D> results;
+	results.reserve(max_results);
+	double last_result_t, last_result_x, last_result_y, end_result;
 	// first value is always 0
 	last_result_t = 0;
 	last_result_x = *interp(last_result_t, Xs);
@@ -115,16 +119,16 @@ Point2D* BezierCurve2D::rasterize (int max_results, double goal_dist, double tol
 		last_result_x = x;
 		last_result_y = y;
 		last_result_t = t;
-		results[results_total].set(x, y);
+		results.push_back(*(new Point2D(x, y)));
 	}
 	return results;
 }
 
-Point2D* BezierCurve2D::rasterizeToX (int max_results, double goal_dist, double tolerance) {
+std::vector<Point2D> BezierCurve2D::rasterizeToX (int max_results, double goal_dist, double tolerance) {
 	return linear_raster(Xs, max_results, goal_dist, tolerance);
 }
 
-Point2D* BezierCurve2D::rasterizeToY (int max_results, double goal_dist, double tolerance) {
+std::vector<Point2D> BezierCurve2D::rasterizeToY (int max_results, double goal_dist, double tolerance) {
 	return linear_raster(Ys, max_results, goal_dist, tolerance);
 }
 

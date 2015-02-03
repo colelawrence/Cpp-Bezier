@@ -27,12 +27,12 @@ private:
 	double* Xs;
 	double* Ys;
 	double calc_dist (double x1, double x2, double y1, double y2);
-	Point2D* linear_raster (double* values, int max_results, double goal_dist, double tolerance);
+	std::vector<Point2D> linear_raster (double* values, int max_results, double goal_dist, double tolerance);
 public:
 	BezierCurve2D(double* x_values, double* y_values, int values_length);
-	Point2D* rasterize (int max_results, double goal_dist, double tolerance);
-	Point2D* rasterizeToX (int max_results, double goal_dist, double tolerance);
-	Point2D* rasterizeToY (int max_results, double goal_dist, double tolerance);
+	std::vector<Point2D> rasterize (int max_results, double goal_dist, double tolerance);
+	std::vector<Point2D> rasterizeToX (int max_results, double goal_dist, double tolerance);
+	std::vector<Point2D> rasterizeToY (int max_results, double goal_dist, double tolerance);
 	Point2D* getT (double t);
 	double measure (double segment_dist, double tolerance);
 };
