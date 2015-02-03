@@ -1,6 +1,7 @@
 #include <cstring>
 #include <cmath>
 #include <vector>
+#include <iostream>
 #include "bezier_utility.h"
 
 
@@ -23,14 +24,17 @@ void Point2D::set(Point2D* point_p) {
 }
 
 BezierBase::BezierBase(int values_length):
-	values_length(values_length){}
+	values_length(values_length) {
+	temp_space = new double[values_length];
+	temp_space_bytes = values_length * 8;
+}
 
 BezierBase::~BezierBase(){
 	delete[] temp_space;
 }
 
 double* BezierBase::interp (double t, double* values) {
-	memcpy(temp_space, values, temp_space_bytes);
+	std::memcpy(temp_space, values, temp_space_bytes);
 	for (int length = values_length - 1; length > 0; --length){
 		for (int i = 0; i < length; i++) {
 			temp_space[i] -= (temp_space[i] - temp_space[i+1]) * t;
@@ -57,7 +61,7 @@ std::vector<Point2D> BezierCurve2D::linear_raster (double* values, int max_resul
 	end_result = *interp(1, values);
 	for (int results_total = 0; results_total < max_results; ++results_total) { // for the amount of results
 		double t, dist, v;
-		if (tolerance > std::abs(end_result - last_result_v))
+		if (tolerance + goal_dist  > std::abs(end_result - last_result_v)) // End if end of curve is met
 			break;
 		double t_low = last_result_t;
 		double t_high = 1; // find a way to approx based on previous
@@ -84,21 +88,22 @@ std::vector<Point2D> BezierCurve2D::linear_raster (double* values, int max_resul
 BezierCurve2D::BezierCurve2D(double* x_values, double* y_values, int values_length):
 	BezierBase(values_length),
 	Xs(x_values),
-	Ys(y_values) {
-	temp_space = new double[values_length];
-	temp_space_bytes = values_length * sizeof(*temp_space);
-}
+	Ys(y_values) {}
 
 std::vector<Point2D> BezierCurve2D::rasterize (int max_results, double goal_dist, double tolerance) {
 	std::vector<Point2D> results;
 	results.reserve(max_results);
-	double last_result_t, last_result_x, last_result_y, end_result;
+	double last_result_t, last_result_x, last_result_y, end_result_x, end_result_y;
 	// first value is always 0
 	last_result_t = 0;
 	last_result_x = *interp(last_result_t, Xs);
 	last_result_y = *interp(last_result_t, Ys);
+	end_result_x = *interp(1, Xs);
+	end_result_y = *interp(1, Ys);
 	for (int results_total = 0; results_total < max_results; ++results_total) { // for the amount of results
 		double t, dist, x, y;
+		if (tolerance + goal_dist > calc_dist(last_result_x, end_result_x, last_result_y, end_result_y)) // End if end of curve is met
+			break;
 		double t_low = last_result_t;
 		double t_high = 1; // find a way to approx based on previous
 		for (int max_iterations = 128; max_iterations > 0; --max_iterations) { // attempt to find next point

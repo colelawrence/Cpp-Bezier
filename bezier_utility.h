@@ -16,6 +16,7 @@ protected:
 	int values_length;
 	double* temp_space;
 	int temp_space_bytes;
+	int count;
 	double* interp (double t, double* values);
 public:
 	BezierBase(int values_length);

@@ -26,8 +26,8 @@ void drawTest3 (sf::RenderWindow* window) {
 	double dist_tolerance = .1;
 	std::vector<Point2D> raster = (*bezier).rasterize(max_results, goal_dist, dist_tolerance);
 	drawPoints(window, raster);
-	delete bezier;
 	std::cout << (*bezier).measure(goal_dist, dist_tolerance) << "\n";
+	delete bezier;
 }
 
 
