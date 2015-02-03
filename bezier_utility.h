@@ -2,13 +2,16 @@
 #define BEZIER_UTILITY_H
 
 class Point2D {
+private:
+	double x;
+	double y;
 public:
-	double X;
-	double Y;
 	Point2D();
 	Point2D(double X, double Y);
 	void set(double X_p, double Y_p);
 	void set(Point2D* point_p);
+	double getX();
+	double getY();
 };
 
 class BezierBase {
@@ -34,7 +37,7 @@ public:
 	std::vector<Point2D> rasterize (int max_results, double goal_dist, double tolerance);
 	std::vector<Point2D> rasterizeToX (int max_results, double goal_dist, double tolerance);
 	std::vector<Point2D> rasterizeToY (int max_results, double goal_dist, double tolerance);
-	Point2D* getT (double t);
+	Point2D getT (double t);
 	double measure (double segment_dist, double tolerance);
 };
 

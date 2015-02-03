@@ -6,21 +6,29 @@
 
 
 Point2D::Point2D():
-	X(0),
-	Y(0) {}
+	x(0),
+	y(0) {}
 
-Point2D::Point2D(double X, double Y):
-	X(X),
-	Y(Y) {}
+Point2D::Point2D(double x, double y):
+	x(x),
+	y(y) {}
 
-void Point2D::set(double X_p, double Y_p) {
-	X = X_p;
-	Y = Y_p;
+void Point2D::set(double x_p, double y_p) {
+	x = x_p;
+	y = y_p;
 }
 
 void Point2D::set(Point2D* point_p) {
-	X = (*point_p).X;
-	Y = (*point_p).Y;
+	x = (*point_p).getX();
+	y = (*point_p).getY();
+}
+
+double Point2D::getX() {
+	return x;
+}
+
+double Point2D::getY() {
+	return y;
 }
 
 BezierBase::BezierBase(int values_length):
@@ -81,7 +89,8 @@ std::vector<Point2D> BezierCurve2D::linear_raster (double* values, int max_resul
 		}
 		last_result_v = v;
 		last_result_t = t;
-		results.push_back(*getT(t));
+		Point2D point = getT(t);
+		results.push_back(point);
 	}
 	return results;
 }
@@ -93,7 +102,7 @@ BezierCurve2D::BezierCurve2D(double* x_values, double* y_values, int values_leng
 std::vector<Point2D> BezierCurve2D::rasterize (int max_results, double goal_dist, double tolerance) {
 	std::vector<Point2D> results;
 	results.reserve(max_results);
-	double last_result_t, last_result_x, last_result_y, end_result_x, end_result_y;
+	double last_result_t, last_result_dt[2] = { 0, 0 }, last_result_x, last_result_y, end_result_x, end_result_y;
 	// first value is always 0
 	last_result_t = 0;
 	last_result_x = *interp(last_result_t, Xs);
@@ -124,7 +133,8 @@ std::vector<Point2D> BezierCurve2D::rasterize (int max_results, double goal_dist
 		last_result_x = x;
 		last_result_y = y;
 		last_result_t = t;
-		results.push_back(*(new Point2D(x, y)));
+		Point2D point(x, y);
+		results.push_back(point);
 	}
 	return results;
 }
@@ -137,10 +147,10 @@ std::vector<Point2D> BezierCurve2D::rasterizeToY (int max_results, double goal_d
 	return linear_raster(Ys, max_results, goal_dist, tolerance);
 }
 
-Point2D* BezierCurve2D::getT (double t) {
+Point2D BezierCurve2D::getT (double t) {
 	double x = *interp(t, Xs);
 	double y = *interp(t, Ys);
-	return new Point2D(x, y);
+	return Point2D(x, y);
 }
 
 double BezierCurve2D::measure (double segment_dist, double tolerance) {

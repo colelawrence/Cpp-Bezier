@@ -3,9 +3,9 @@
 #include <SFML/Graphics.hpp>
 #include "bezier_utility.h"
 
-void drawPoint (sf::RenderWindow* window, const Point2D &point) {
+void drawPoint (sf::RenderWindow* window, Point2D point) {
 	sf::RectangleShape drawPoint(sf::Vector2f(4, 4));
-	drawPoint.setPosition(float(point.X) - 2, float(point.Y) - 2);
+	drawPoint.setPosition(float(point.getX()) - 2, float(point.getY()) - 2);
     (*window).draw(drawPoint);
 }
 
