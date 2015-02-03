@@ -133,8 +133,7 @@ std::vector<Point2D> BezierCurve2D::rasterize (int max_results, double goal_dist
 		last_result_x = x;
 		last_result_y = y;
 		last_result_t = t;
-		Point2D point(x, y);
-		results.push_back(point);
+		results.emplace_back(x, y);
 	}
 	return results;
 }
