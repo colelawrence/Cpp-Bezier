@@ -13,24 +13,6 @@ Point2D::Point2D(double x, double y):
 	x(x),
 	y(y) {}
 
-void Point2D::set(double x_p, double y_p) {
-	x = x_p;
-	y = y_p;
-}
-
-void Point2D::set(Point2D* point_p) {
-	x = (*point_p).getX();
-	y = (*point_p).getY();
-}
-
-double Point2D::getX() {
-	return x;
-}
-
-double Point2D::getY() {
-	return y;
-}
-
 BezierBase::BezierBase(int values_length):
 	values_length(values_length) {
 	temp_space = new double[values_length];
@@ -89,8 +71,7 @@ std::vector<Point2D> BezierCurve2D::linear_raster (double* values, int max_resul
 		}
 		last_result_v = v;
 		last_result_t = t;
-		Point2D point = getT(t);
-		results.push_back(point);
+		results.push_back(getT(t));
 	}
 	return results;
 }

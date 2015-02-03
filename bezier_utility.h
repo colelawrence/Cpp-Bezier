@@ -2,16 +2,11 @@
 #define BEZIER_UTILITY_H
 
 class Point2D {
-private:
+public:
 	double x;
 	double y;
-public:
 	Point2D();
-	Point2D(double X, double Y);
-	void set(double X_p, double Y_p);
-	void set(Point2D* point_p);
-	double getX();
-	double getY();
+	Point2D(double x, double y);
 };
 
 class BezierBase {
