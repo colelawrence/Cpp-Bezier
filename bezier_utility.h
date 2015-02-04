@@ -1,6 +1,8 @@
 #ifndef BEZIER_UTILITY_H
 #define BEZIER_UTILITY_H
 
+#include<vector>
+
 class Point2D {
 public:
 	double x;

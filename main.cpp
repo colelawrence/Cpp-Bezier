@@ -1,3 +1,4 @@
+#include "draggable.h"
 #include<iostream>
 #include<vector>
 #include <SFML/Graphics.hpp>
@@ -15,7 +16,7 @@ void drawPoints (sf::RenderWindow* window, const std::vector<Point2D> &points) {
 	}
 }
 
-void drawTest3 (sf::RenderWindow* window) {
+void drawTest3 (sf::RenderWindow* window,const std::vector<Draggable> &control_points ) {
 	// Test code
 
 	double xs[4] = { 400, 700, 100, 400};
@@ -30,6 +31,12 @@ void drawTest3 (sf::RenderWindow* window) {
 	delete bezier;
 }
 
+void drawControls(sf::RenderWindow* window, std::vector<Draggable> control_points) {
+	for (int i = 0; i < control_points.size(); i++)
+	{
+		drawPoint(window, control_points.at(i).getPosition());
+	}
+}
 
 int main()
 {
@@ -37,16 +44,57 @@ int main()
     //sf::CircleShape shape(3.f);
 	//shape.setFillColor(sf::Color::White);
 
-	window.clear();
-	drawTest3(&window);
-    window.display();
-    while (window.isOpen()) {
-		sf::Event event;
-		while (window.pollEvent(event)) {
-			if (event.type == sf::Event::Closed)
-				window.close();
-		}
-	}
+	Point2D last_position;
+	std::vector<Draggable> control_points;
+	control_points.emplace_back(400, 100);
+	control_points.emplace_back(700, 790);
+	control_points.emplace_back(100, 10);
+	control_points.emplace_back(400, 700);
 
+	bool active_dragging = false;
+	Draggable* active_control_point;
+    while (window.isOpen())
+	{
+		sf::Event event;
+		while (window.pollEvent(event))
+		{
+			if (event.type == sf::Event::Closed || event.key.code == sf::Keyboard::Escape) window.close();
+
+			if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left)
+			{
+				last_position.x = double(event.mouseButton.x);
+				last_position.y = double(event.mouseButton.y);
+				for (int i = 0; i < control_points.size(); i++)
+				{
+					if (control_points.at(i).intersects(last_position.x, last_position.y))
+					{
+						active_control_point = &control_points.at(i);
+						active_dragging = true;
+						break;
+					}
+				}
+			}
+			if (event.type == sf::Event::MouseMoved)
+			{
+				if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
+				{
+					if (active_dragging)
+					{
+						double dx = last_position.x - event.mouseMove.x;
+						double dy = last_position.y - event.mouseMove.y;
+					}
+				} else
+				{
+					active_dragging = false;
+				}
+			}
+		}
+		window.clear();
+		drawControls(&window, control_points);
+		drawTest3(&window, control_points);
+		window.display();
+	}
+	
 	return 0;
 }
+//*/
