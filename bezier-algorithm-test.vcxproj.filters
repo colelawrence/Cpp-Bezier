@@ -21,9 +21,15 @@
     <ClCompile Include="bezier_utility.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="draggable.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="bezier_utility.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="draggable.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

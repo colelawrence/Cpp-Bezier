@@ -1,15 +1,14 @@
 #include "bezier_utility.h"
 
-class Draggable {
+class Draggable: public Point2D {
 private:
-	double x;
-	double y;
-	double w;
-	double h;
+	int w;
+	int h;
 public:
+	bool active;
 	Draggable();
-	Draggable(double x, double y, double h, double w);
-	bool intersects(double p_x, double p_y);
-	void move(double p_x, double p_y);
-	Point2D getPosition();
+	Draggable(int x, int y);
+	Draggable(int x, int y, int h, int w);
+	bool intersects(int p_x, int p_y) const;
+	void move(int p_x, int p_y);
 };

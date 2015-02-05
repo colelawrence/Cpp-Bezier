@@ -4,9 +4,9 @@
 #include <SFML/Graphics.hpp>
 #include "bezier_utility.h"
 
-void drawPoint (sf::RenderWindow* window, const Point2D &point) {
-	sf::RectangleShape drawPoint(sf::Vector2f(4, 4));
-	drawPoint.setPosition(float(point.x) - 2, float(point.y) - 2);
+void drawPoint (sf::RenderWindow* window, const Point2D &point, int size = 4) {
+	sf::RectangleShape drawPoint(sf::Vector2f(size, size));
+	drawPoint.setPosition(float(point.x) - .5 * size, float(point.y) - .5 * size);
     (*window).draw(drawPoint);
 }
 
@@ -21,20 +21,20 @@ void drawTest3 (sf::RenderWindow* window,const std::vector<Draggable> &control_p
 
 	double xs[4] = { 400, 700, 100, 400};
 	double ys[4] = { 100, 790, 10, 700 };
-	BezierCurve2D* bezier = new BezierCurve2D(xs, ys, 4);
+	
+	BezierCurve2D bezier(xs, ys, 4);
 	int max_results = 200;
 	double goal_dist = 12;
 	double dist_tolerance = .1;
-	std::vector<Point2D> raster = (*bezier).rasterize(max_results, goal_dist, dist_tolerance);
+	std::vector<Point2D> raster = bezier.rasterize(max_results, goal_dist, dist_tolerance);
 	drawPoints(window, raster);
-	std::cout << (*bezier).measure(goal_dist, dist_tolerance) << "\n";
-	delete bezier;
+	//std::cout << bezier.measure(goal_dist, dist_tolerance) << "\n";
 }
 
-void drawControls(sf::RenderWindow* window, std::vector<Draggable> control_points) {
+void drawControls(sf::RenderWindow* window, const std::vector<Draggable> &control_points) {
 	for (int i = 0; i < control_points.size(); i++)
 	{
-		drawPoint(window, control_points.at(i).getPosition());
+		drawPoint(window, control_points.at(i), 8);
 	}
 }
 
@@ -44,7 +44,8 @@ int main()
     //sf::CircleShape shape(3.f);
 	//shape.setFillColor(sf::Color::White);
 
-	Point2D last_position;
+	int last_position_x;
+	int last_position_y;
 	std::vector<Draggable> control_points;
 	control_points.emplace_back(400, 100);
 	control_points.emplace_back(700, 790);
@@ -52,7 +53,8 @@ int main()
 	control_points.emplace_back(400, 700);
 
 	bool active_dragging = false;
-	Draggable* active_control_point;
+	Draggable *active_control_point;
+	active_control_point = NULL;
     while (window.isOpen())
 	{
 		sf::Event event;
@@ -62,15 +64,17 @@ int main()
 
 			if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left)
 			{
-				last_position.x = double(event.mouseButton.x);
-				last_position.y = double(event.mouseButton.y);
-				for (int i = 0; i < control_points.size(); i++)
+				if (active_control_point == NULL)
 				{
-					if (control_points.at(i).intersects(last_position.x, last_position.y))
+					last_position_x = event.mouseButton.x;
+					last_position_y = event.mouseButton.y;
+					for (int i = 0; i < control_points.size(); i++)
 					{
-						active_control_point = &control_points.at(i);
-						active_dragging = true;
-						break;
+						if (control_points.at(i).intersects(last_position_x, last_position_y))
+						{
+							active_control_point = &control_points.at(i);
+							break;
+						}
 					}
 				}
 			}
@@ -78,14 +82,16 @@ int main()
 			{
 				if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
 				{
-					if (active_dragging)
-					{
-						double dx = last_position.x - event.mouseMove.x;
-						double dy = last_position.y - event.mouseMove.y;
+					if (active_control_point != NULL) {
+						int dx = last_position_x - event.mouseMove.x;
+						int dy = last_position_y - event.mouseMove.y;
+						last_position_x = event.mouseMove.x;
+						last_position_y = event.mouseMove.y;
+						(*active_control_point).move(-dx, -dy);
 					}
 				} else
 				{
-					active_dragging = false;
+					active_control_point = NULL;
 				}
 			}
 		}
@@ -94,6 +100,7 @@ int main()
 		drawTest3(&window, control_points);
 		window.display();
 	}
+	//*/
 	
 	return 0;
 }
