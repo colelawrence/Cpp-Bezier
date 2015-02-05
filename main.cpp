@@ -19,10 +19,14 @@ void drawPoints (sf::RenderWindow* window, const std::vector<Point2D> &points) {
 void drawTest3 (sf::RenderWindow* window,const std::vector<Draggable> &control_points ) {
 	// Test code
 
-	double xs[4] = { 400, 700, 100, 400};
-	double ys[4] = { 100, 790, 10, 700 };
-	
-	BezierCurve2D bezier(xs, ys, 4);
+	int size = control_points.size();
+	double* xs = new double(size);
+	double* ys = new double(size);
+	for (int i = 0; i < size; ++i) {
+		xs[i] = control_points.at(i).x;
+		ys[i] = control_points.at(i).y;
+	}
+	BezierCurve2D bezier(xs, ys, size);
 	int max_results = 200;
 	double goal_dist = 12;
 	double dist_tolerance = .1;
