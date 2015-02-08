@@ -2,14 +2,7 @@
 #define BEZIER_UTILITY_H
 
 #include<vector>
-
-class Point2D {
-public:
-	double x;
-	double y;
-	Point2D();
-	Point2D(double x, double y);
-};
+#include "point.h"
 
 class BezierBase {
 protected:

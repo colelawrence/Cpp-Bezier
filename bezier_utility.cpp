@@ -3,15 +3,7 @@
 #include <vector>
 #include <iostream>
 #include "bezier_utility.h"
-
-
-Point2D::Point2D():
-	x(0),
-	y(0) {}
-
-Point2D::Point2D(double x, double y):
-	x(x),
-	y(y) {}
+#include "point.h"
 
 BezierBase::BezierBase(int values_length):
 	values_length(values_length) {

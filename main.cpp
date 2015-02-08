@@ -3,6 +3,7 @@
 #include<vector>
 #include <SFML/Graphics.hpp>
 #include "bezier_utility.h"
+#include "point.h"
 
 void drawPoint (sf::RenderWindow* window, const Point2D &point, int size = 4) {
 	sf::RectangleShape drawPoint(sf::Vector2f(size, size));
