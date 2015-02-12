@@ -31,16 +31,14 @@ void drawTest3 (sf::RenderWindow* window,const std::vector<Draggable> &control_p
 	int max_results = 200;
 	double goal_dist = 12;
 	double dist_tolerance = .1;
-	std::vector<Point2D> raster = bezier.rasterize(max_results, goal_dist, dist_tolerance);
+	std::vector<Point2D> raster = bezier.rasterizeToX(max_results, goal_dist, dist_tolerance);
 	drawPoints(window, raster);
 	//std::cout << bezier.measure(goal_dist, dist_tolerance) << "\n";
 }
 
 void drawControls(sf::RenderWindow* window, const std::vector<Draggable> &control_points) {
 	for (int i = 0; i < control_points.size(); i++)
-	{
 		drawPoint(window, control_points.at(i), 8);
-	}
 }
 
 int main()
@@ -52,10 +50,10 @@ int main()
 	int last_position_x;
 	int last_position_y;
 	std::vector<Draggable> control_points;
-	control_points.emplace_back(400, 100);
+	control_points.emplace_back(10, 100, false);
 	control_points.emplace_back(700, 790);
 	control_points.emplace_back(100, 10);
-	control_points.emplace_back(400, 700);
+	control_points.emplace_back(790, 700, false);
 
 	bool active_dragging = false;
 	Draggable *active_control_point;
